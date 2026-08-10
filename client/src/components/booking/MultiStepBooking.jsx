@@ -235,30 +235,38 @@ export const MultiStepBooking = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {services.map((srv) => (
-              <div
-                key={srv._id}
-                onClick={() => setSelectedService(srv)}
-                className={`glass-card rounded-2xl p-5 cursor-pointer transition-all border ${
-                  selectedService?._id === srv._id
-                    ? 'border-brand-500 bg-brand-500/10 shadow-lg shadow-brand-500/10'
-                    : 'border-slate-800 hover:border-slate-700'
-                }`}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-brand-400 border border-slate-700">
-                    {srv.category}
-                  </span>
-                  <span className="text-sm font-extrabold text-white">{formatCurrency(srv.price)}</span>
+            {services.map((srv) => {
+              const isSelected = selectedService?._id === srv._id;
+              return (
+                <div
+                  key={srv._id}
+                  onClick={() => setSelectedService(srv)}
+                  className={`glass-card rounded-2xl p-5 cursor-pointer transition-all border relative ${
+                    isSelected
+                      ? 'border-brand-500 bg-brand-500/20 ring-2 ring-brand-500 shadow-xl shadow-brand-500/20 scale-[1.02]'
+                      : 'border-slate-800 hover:border-slate-700 hover:scale-[1.01]'
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="absolute top-3 right-3 text-brand-400 bg-brand-500/20 p-1 rounded-full border border-brand-500/40 animate-in zoom-in-95">
+                      <CheckCircle2 className="w-5 h-5 text-brand-400 fill-brand-500/30" />
+                    </div>
+                  )}
+                  <div className="flex justify-between items-start mb-2 pr-8">
+                    <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-brand-400 border border-slate-700">
+                      {srv.category}
+                    </span>
+                    <span className="text-sm font-extrabold text-white">{formatCurrency(srv.price)}</span>
+                  </div>
+                  <h3 className="text-base font-bold text-white mb-1">{srv.name}</h3>
+                  <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">{srv.description}</p>
+                  <div className="flex items-center text-xs font-medium text-slate-400 pt-3 border-t border-slate-800/80">
+                    <Clock className="w-3.5 h-3.5 mr-1.5 text-brand-400" />
+                    <span>{srv.duration} Minutes Duration</span>
+                  </div>
                 </div>
-                <h3 className="text-base font-bold text-white mb-1">{srv.name}</h3>
-                <p className="text-xs text-slate-400 line-clamp-2 mb-4 leading-relaxed">{srv.description}</p>
-                <div className="flex items-center text-xs font-medium text-slate-400 pt-3 border-t border-slate-800/80">
-                  <Clock className="w-3.5 h-3.5 mr-1.5 text-brand-400" />
-                  <span>{srv.duration} Minutes Duration</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="flex justify-end pt-4">
@@ -282,36 +290,44 @@ export const MultiStepBooking = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {staffList.map((stf) => (
-              <div
-                key={stf._id}
-                onClick={() => setSelectedStaff(stf)}
-                className={`glass-card rounded-2xl p-5 cursor-pointer transition-all border text-center ${
-                  selectedStaff?._id === stf._id
-                    ? 'border-brand-500 bg-brand-500/10 shadow-lg shadow-brand-500/10'
-                    : 'border-slate-800 hover:border-slate-700'
-                }`}
-              >
-                {stf.profileImage ? (
-                  <img
-                    src={stf.profileImage}
-                    alt={stf.name}
-                    className="w-16 h-16 rounded-2xl object-cover mx-auto mb-3 border border-slate-700 shadow-md"
-                  />
-                ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-brand-500/20 border border-brand-500/30 text-brand-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
-                    {stf.name.charAt(0)}
-                  </div>
-                )}
-                <h3 className="text-sm font-bold text-white">{stf.name}</h3>
-                <p className="text-xs text-brand-400 font-semibold mb-1">{stf.specialization}</p>
-                <p className="text-[11px] text-slate-400 mb-3">{stf.department}</p>
+            {staffList.map((stf) => {
+              const isSelected = selectedStaff?._id === stf._id;
+              return (
+                <div
+                  key={stf._id}
+                  onClick={() => setSelectedStaff(stf)}
+                  className={`glass-card rounded-2xl p-5 cursor-pointer transition-all border text-center relative ${
+                    isSelected
+                      ? 'border-brand-500 bg-brand-500/20 ring-2 ring-brand-500 shadow-xl shadow-brand-500/20 scale-[1.02]'
+                      : 'border-slate-800 hover:border-slate-700 hover:scale-[1.01]'
+                  }`}
+                >
+                  {isSelected && (
+                    <div className="absolute top-3 right-3 text-brand-400 bg-brand-500/20 p-1 rounded-full border border-brand-500/40 animate-in zoom-in-95">
+                      <CheckCircle2 className="w-5 h-5 text-brand-400 fill-brand-500/30" />
+                    </div>
+                  )}
+                  {stf.profileImage ? (
+                    <img
+                      src={stf.profileImage}
+                      alt={stf.name}
+                      className="w-16 h-16 rounded-2xl object-cover mx-auto mb-3 border border-slate-700 shadow-md"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-2xl bg-brand-500/20 border border-brand-500/30 text-brand-400 flex items-center justify-center font-bold text-xl mx-auto mb-3">
+                      {stf.name.charAt(0)}
+                    </div>
+                  )}
+                  <h3 className="text-sm font-bold text-white">{stf.name}</h3>
+                  <p className="text-xs text-brand-400 font-semibold mb-1">{stf.specialization}</p>
+                  <p className="text-[11px] text-slate-400 mb-3">{stf.department}</p>
 
-                <div className="text-[10px] text-slate-400 bg-slate-900/60 p-2 rounded-xl border border-slate-800">
-                  <span>Hours: {stf.workingHours?.start} - {stf.workingHours?.end}</span>
+                  <div className="text-[10px] text-slate-400 bg-slate-900/60 p-2 rounded-xl border border-slate-800">
+                    <span>Hours: {stf.workingHours?.start} - {stf.workingHours?.end}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="flex justify-between pt-4">
@@ -377,19 +393,23 @@ export const MultiStepBooking = () => {
                 </div>
               ) : (
                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-h-60 overflow-y-auto pr-1">
-                  {availableSlots.map((slot, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`p-2.5 rounded-xl text-xs font-bold transition-all border ${
-                        selectedSlot?.startTime === slot.startTime
-                          ? 'bg-brand-600 text-white border-brand-500 shadow-md'
-                          : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-brand-500/50'
-                      }`}
-                    >
-                      {formatTime(slot.startTime)}
-                    </button>
-                  ))}
+                  {availableSlots.map((slot, i) => {
+                    const isSelected = selectedSlot?.startTime === slot.startTime;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => setSelectedSlot(slot)}
+                        className={`p-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1.5 ${
+                          isSelected
+                            ? 'bg-brand-600 text-white border-brand-500 ring-2 ring-brand-400 shadow-lg shadow-brand-600/30 scale-[1.05]'
+                            : 'bg-slate-900 text-slate-300 border-slate-800 hover:border-brand-500/50 hover:scale-[1.02]'
+                        }`}
+                      >
+                        {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-white" />}
+                        {formatTime(slot.startTime)}
+                      </button>
+                    );
+                  })}
                 </div>
               )}
             </div>
