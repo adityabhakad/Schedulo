@@ -1,20 +1,45 @@
-# Schedulo Demonstration & Screenshot Verification Checklist
+# Schedulo Platform Visual Demonstration
 
-This directory contains visual documentation guidelines for the **Schedulo** technical submission.
+This directory contains real application screenshots showcasing the key interfaces and workflows of the **Schedulo** enterprise platform.
 
 ---
 
-## 📸 Recommended Technical Screenshots Checklist
+## 📸 Captured System Screenshots
 
-Before final assessment submission, capture screenshots of the running application and place them in this folder:
+### 1. Executive Admin Dashboard & Analytics
+![Admin Analytics Dashboard](04_AdminDashboard_Analytics.png)
+*Real-time executive metrics dashboard displaying overall user count, active staff, total services, estimated revenue, Recharts appointment status pie chart, monthly volume trends, staff workload distribution, and top service performance ranking.*
 
-- [ ] **01_LandingPage.png**: Hero section, key features, and call-to-action banner.
-- [ ] **02_Login_QuickDemoAccess.png**: Authentication page highlighting Quick Demo Access buttons for User, Staff, and Admin roles.
-- [ ] **03_UserDashboard.png**: Client workspace showing KPI stats, upcoming visit spotlight, and in-place filtered appointments.
-- [ ] **04_BookAppointment_MultiStep.png**: Interactive multi-step booking wizard with selected service & staff glowing rings.
-- [ ] **05_AppointmentDetailsPage.png**: Detailed appointment view showing status badge, reference ID, and action options.
-- [ ] **06_StaffDashboard.png**: Staff portal dashboard showing pending action queue and daily agenda table.
-- [ ] **07_ManageAppointmentsPage.png**: Comprehensive appointment list with search bar, status dropdown, and cancellation modal.
-- [ ] **08_AdminDashboard.png**: Executive dashboard displaying platform KPIs, user counts, and active services.
-- [ ] **09_AnalyticsPage.png**: Recharts revenue distribution, appointment status metrics, and service workload charts.
-- [ ] **10_SuccessfulWorkflow.png**: Complete end-to-end flow from client booking request to staff confirmation.
+---
+
+### 2. Staff Portal Dashboard
+![Staff Portal Dashboard](05_StaffDashboard.png)
+*Staff specialist overview displaying pending action request queue (with Approve, Reschedule, Reject controls) and today's scheduled agenda table.*
+
+---
+
+### 3. Service Catalog Management
+![Service Catalog Management](01_ManageServices.png)
+*Administrative catalog management interface featuring search, active service cards, pricing details, duration tags, and edit/delete controls.*
+
+---
+
+### 4. Specialist Staff Management
+![Specialist Staff Management](02_ManageStaff.png)
+*Staff directory management panel displaying specialist department, contact info, shift hours, assigned working days, and modal management controls.*
+
+---
+
+### 5. Daily Specialist Agenda Schedule
+![Daily Specialist Agenda Schedule](03_DailySchedule.png)
+*Individual specialist daily agenda view filtering completed and upcoming appointment time slots.*
+
+---
+
+## 📋 Screenshots Checklist Status
+
+- [x] **01_ManageServices.png**: Admin service catalog management
+- [x] **02_ManageStaff.png**: Specialist staff management
+- [x] **03_DailySchedule.png**: Staff daily schedule agenda
+- [x] **04_AdminDashboard_Analytics.png**: Executive dashboard & Recharts analytics
+- [x] **05_StaffDashboard.png**: Staff portal dashboard & pending requests queue
