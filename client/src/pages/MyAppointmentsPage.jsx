@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getAppointments, updateAppointmentStatus } from '../services/appointmentService';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -13,11 +13,12 @@ import { Search, Filter, Calendar, Clock, XCircle, CheckCircle, RefreshCw } from
 export const MyAppointmentsPage = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const [searchParams] = useSearchParams();
 
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [selectedAppToCancel, setSelectedAppToCancel] = useState(null);
   const [cancellationReason, setCancellationReason] = useState('');
   const [cancelModalOpen, setCancelModalOpen] = useState(false);

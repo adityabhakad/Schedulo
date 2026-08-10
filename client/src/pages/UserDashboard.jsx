@@ -16,13 +16,15 @@ import {
   ChevronRight,
   User,
   Sparkles,
+  Filter,
 } from 'lucide-react';
 
 export const UserDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
-  const [recentAppointments, setRecentAppointments] = useState([]);
+  const [allAppointments, setAllAppointments] = useState([]);
+  const [activeFilter, setActiveFilter] = useState('ALL'); // 'ALL' | 'PENDING' | 'CONFIRMED' | 'COMPLETED'
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,7 +32,7 @@ export const UserDashboard = () => {
       try {
         const [statsRes, appRes] = await Promise.all([getDashboardStats(), getAppointments()]);
         if (statsRes.success) setStats(statsRes.data);
-        if (appRes.success) setRecentAppointments(appRes.data.slice(0, 5));
+        if (appRes.success) setAllAppointments(appRes.data);
       } catch (error) {
         console.error('Error fetching user dashboard data:', error);
       } finally {
@@ -45,6 +47,12 @@ export const UserDashboard = () => {
   }
 
   const nextApp = stats?.nextAppointment;
+
+  // Filter appointments list based on selected stat card filter
+  const displayedAppointments = allAppointments.filter((app) => {
+    if (activeFilter === 'ALL') return true;
+    return app.status === activeFilter;
+  });
 
   return (
     <div className="space-y-8 animate-in fade-in">
@@ -70,39 +78,43 @@ export const UserDashboard = () => {
         </Link>
       </div>
 
-      {/* KPI Stats Grid (Clickable) */}
+      {/* KPI Stats Grid (Interactive Filtering) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           title="Total Appointments"
           value={stats?.totalAppointments || 0}
           icon={CalendarCheck}
           color="brand"
-          subtitle="Click to view all"
-          onClick={() => navigate('/my-appointments')}
+          subtitle={activeFilter === 'ALL' ? 'Showing all appointments below' : 'Click to show all appointments'}
+          onClick={() => setActiveFilter('ALL')}
+          isActive={activeFilter === 'ALL'}
         />
         <StatCard
           title="Pending Confirmation"
           value={stats?.pending || 0}
           icon={Clock}
           color="amber"
-          subtitle="Click to filter pending"
-          onClick={() => navigate('/my-appointments?status=PENDING')}
+          subtitle={activeFilter === 'PENDING' ? 'Showing pending only below' : 'Click to filter pending only'}
+          onClick={() => setActiveFilter('PENDING')}
+          isActive={activeFilter === 'PENDING'}
         />
         <StatCard
           title="Confirmed Bookings"
           value={stats?.confirmed || 0}
           icon={CheckCircle2}
           color="emerald"
-          subtitle="Click to filter confirmed"
-          onClick={() => navigate('/my-appointments?status=CONFIRMED')}
+          subtitle={activeFilter === 'CONFIRMED' ? 'Showing confirmed only below' : 'Click to filter confirmed only'}
+          onClick={() => setActiveFilter('CONFIRMED')}
+          isActive={activeFilter === 'CONFIRMED'}
         />
         <StatCard
           title="Completed Visits"
           value={stats?.completed || 0}
           icon={CheckCircle2}
           color="blue"
-          subtitle="Click to filter completed"
-          onClick={() => navigate('/my-appointments?status=COMPLETED')}
+          subtitle={activeFilter === 'COMPLETED' ? 'Showing completed only below' : 'Click to filter completed only'}
+          onClick={() => setActiveFilter('COMPLETED')}
+          isActive={activeFilter === 'COMPLETED'}
         />
       </div>
 
@@ -154,13 +166,44 @@ export const UserDashboard = () => {
         </div>
       )}
 
-      {/* Recent Appointments Table */}
+      {/* Appointments List Filter Table */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">Recent Appointments</h2>
-          <Link to="/my-appointments" className="text-xs font-bold text-brand-400 hover:underline flex items-center gap-1">
-            View All <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              {activeFilter === 'ALL' && 'All Appointments History'}
+              {activeFilter === 'PENDING' && 'Pending Appointment Requests'}
+              {activeFilter === 'CONFIRMED' && 'Confirmed Appointments'}
+              {activeFilter === 'COMPLETED' && 'Completed Visits History'}
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20">
+                {displayedAppointments.length}
+              </span>
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Filtered by active selection: <span className="font-bold text-brand-400">{activeFilter}</span>
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {/* Filter Toggle Buttons */}
+            {['ALL', 'PENDING', 'CONFIRMED', 'COMPLETED'].map((filterKey) => (
+              <button
+                key={filterKey}
+                onClick={() => setActiveFilter(filterKey)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
+                  activeFilter === filterKey
+                    ? 'bg-brand-600 text-white border-brand-500 shadow-md'
+                    : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
+                }`}
+              >
+                {filterKey}
+              </button>
+            ))}
+
+            <Link to="/my-appointments" className="text-xs font-bold text-brand-400 hover:underline flex items-center gap-1 ml-2">
+              Full List <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
         </div>
 
         <div className="glass-panel rounded-2xl overflow-hidden border border-slate-800">
@@ -176,14 +219,14 @@ export const UserDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/60">
-                {recentAppointments.length === 0 ? (
+                {displayedAppointments.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
-                      No appointment records found.
+                      No {activeFilter === 'ALL' ? '' : activeFilter.toLowerCase()} appointments found.
                     </td>
                   </tr>
                 ) : (
-                  recentAppointments.map((app) => (
+                  displayedAppointments.map((app) => (
                     <tr key={app._id} className="hover:bg-slate-800/40 transition-colors">
                       <td className="px-6 py-4 font-bold text-white">{app.service?.name}</td>
                       <td className="px-6 py-4 text-slate-300">{app.staff?.name}</td>
