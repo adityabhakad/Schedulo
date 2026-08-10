@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
@@ -18,6 +18,8 @@ import {
   User,
   Calendar,
   AlertCircle,
+  FileText,
+  Filter,
 } from 'lucide-react';
 
 export const StaffDashboard = () => {
@@ -28,6 +30,15 @@ export const StaffDashboard = () => {
   const [todayAppointments, setTodayAppointments] = useState([]);
   const [pendingRequests, setPendingRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Smooth Scroll Section Refs
+  const pendingSectionRef = useRef(null);
+  const todaySectionRef = useRef(null);
+
+  // Filtered Appointments Modal State (For Confirmed & Completed cards)
+  const [filterModalStatus, setFilterModalStatus] = useState(null); // 'CONFIRMED' | 'COMPLETED' | null
+  const [filteredList, setFilteredList] = useState([]);
+  const [modalLoading, setModalLoading] = useState(false);
 
   // Status Action Modals State
   const [actionApp, setActionApp] = useState(null);
@@ -64,6 +75,22 @@ export const StaffDashboard = () => {
     fetchStaffData();
   }, []);
 
+  // Fetch specific status appointments when stat card is clicked
+  const openStatusModal = async (status) => {
+    setFilterModalStatus(status);
+    setModalLoading(true);
+    try {
+      const res = await getAppointments({ status });
+      if (res.success) {
+        setFilteredList(res.data);
+      }
+    } catch (err) {
+      showToast(`Failed to load ${status.toLowerCase()} appointments`, 'error');
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
   const handleStatusChange = async (appId, newStatus, payload = {}) => {
     setSubmitting(true);
     try {
@@ -77,6 +104,9 @@ export const StaffDashboard = () => {
         setRescheduleModalOpen(false);
         setActionApp(null);
         fetchStaffData();
+        if (filterModalStatus) {
+          openStatusModal(filterModalStatus);
+        }
       }
     } catch (error) {
       showToast(error.response?.data?.message || 'Failed to update appointment status', 'error');
@@ -113,16 +143,46 @@ export const StaffDashboard = () => {
         </Link>
       </div>
 
-      {/* KPI Stats */}
+      {/* Interactive KPI Stats (Clickable) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Today's Schedule" value={stats?.todayAppointments || 0} icon={CalendarCheck} color="brand" />
-        <StatCard title="Pending Requests" value={stats?.pendingRequests || 0} icon={Clock} color="amber" />
-        <StatCard title="Confirmed Appointments" value={stats?.confirmedAppointments || 0} icon={CheckCircle2} color="emerald" />
-        <StatCard title="Completed Visits" value={stats?.completedAppointments || 0} icon={CheckCircle2} color="blue" />
+        <StatCard
+          title="Today's Schedule"
+          value={stats?.todayAppointments || 0}
+          icon={CalendarCheck}
+          color="brand"
+          subtitle="Click to jump to agenda"
+          onClick={() => todaySectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        />
+        <StatCard
+          title="Pending Requests"
+          value={stats?.pendingRequests || 0}
+          icon={Clock}
+          color="amber"
+          subtitle="Click to review queue"
+          onClick={() => pendingSectionRef.current?.scrollIntoView({ behavior: 'smooth' })}
+        />
+        <StatCard
+          title="Confirmed Appointments"
+          value={stats?.confirmedAppointments || 0}
+          icon={CheckCircle2}
+          color="emerald"
+          subtitle="Click to view all confirmed"
+          onClick={() => openStatusModal('CONFIRMED')}
+          isActive={filterModalStatus === 'CONFIRMED'}
+        />
+        <StatCard
+          title="Completed Visits"
+          value={stats?.completedAppointments || 0}
+          icon={CheckCircle2}
+          color="blue"
+          subtitle="Click to view completed history"
+          onClick={() => openStatusModal('COMPLETED')}
+          isActive={filterModalStatus === 'COMPLETED'}
+        />
       </div>
 
       {/* Pending Appointment Requests Action Queue */}
-      <div className="space-y-4">
+      <div ref={pendingSectionRef} className="space-y-4 scroll-mt-24">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-white flex items-center gap-2">
             <Clock className="w-5 h-5 text-amber-400" /> Pending Action Requests ({pendingRequests.length})
@@ -189,7 +249,7 @@ export const StaffDashboard = () => {
       </div>
 
       {/* Today's Schedule Agenda */}
-      <div className="space-y-4">
+      <div ref={todaySectionRef} className="space-y-4 scroll-mt-24">
         <h2 className="text-lg font-bold text-white flex items-center gap-2">
           <Calendar className="w-5 h-5 text-brand-400" /> Today's Scheduled Agenda
         </h2>
@@ -242,6 +302,55 @@ export const StaffDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal for Confirmed / Completed Card Details */}
+      <Modal
+        isOpen={Boolean(filterModalStatus)}
+        onClose={() => setFilterModalStatus(null)}
+        title={filterModalStatus === 'CONFIRMED' ? 'All Confirmed Appointments' : 'All Completed Visits History'}
+        maxWidth="max-w-3xl"
+      >
+        {modalLoading ? (
+          <div className="py-8 text-center text-xs text-slate-400">
+            Loading {filterModalStatus?.toLowerCase()} appointments from MongoDB...
+          </div>
+        ) : filteredList.length === 0 ? (
+          <div className="py-8 text-center text-xs text-slate-400">
+            No {filterModalStatus?.toLowerCase()} appointments found.
+          </div>
+        ) : (
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-1">
+            {filteredList.map((app) => (
+              <div
+                key={app._id}
+                className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+              >
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-sm text-white">{app.user?.name}</span>
+                    <StatusBadge status={app.status} />
+                  </div>
+                  <p className="text-xs font-semibold text-brand-400">{app.service?.name}</p>
+                  <p className="text-xs text-slate-300">
+                    <strong>Date & Time:</strong> {formatDate(app.appointmentDate)} ({formatTime(app.startTime)} - {formatTime(app.endTime)})
+                  </p>
+                  {app.reason && <p className="text-xs text-slate-400 italic">"Reason: {app.reason}"</p>}
+                </div>
+
+                {filterModalStatus === 'CONFIRMED' && (
+                  <button
+                    onClick={() => handleStatusChange(app._id, 'COMPLETED')}
+                    disabled={submitting}
+                    className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 transition-colors shadow-md shrink-0"
+                  >
+                    Mark Completed
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </Modal>
 
       {/* Reject Modal */}
       <Modal

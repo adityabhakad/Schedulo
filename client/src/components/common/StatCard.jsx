@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const StatCard = ({ title, value, icon: Icon, color = 'brand', trend, subtitle }) => {
+export const StatCard = ({ title, value, icon: Icon, color = 'brand', trend, subtitle, onClick, isActive }) => {
   const colorStyles = {
     brand: 'text-brand-400 bg-brand-500/10 border-brand-500/20',
     emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
@@ -13,7 +13,12 @@ export const StatCard = ({ title, value, icon: Icon, color = 'brand', trend, sub
   const style = colorStyles[color] || colorStyles.brand;
 
   return (
-    <div className="glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 hover:scale-[1.01]">
+    <div
+      onClick={onClick}
+      className={`glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 ${
+        onClick ? 'cursor-pointer hover:scale-[1.03] hover:border-brand-500/40 active:scale-[0.98]' : 'hover:scale-[1.01]'
+      } ${isActive ? 'ring-2 ring-brand-500 border-brand-500/50 bg-slate-900/90 shadow-xl shadow-brand-500/10' : ''}`}
+    >
       <div className="flex items-center justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">{title}</p>

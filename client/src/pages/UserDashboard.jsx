@@ -20,6 +20,7 @@ import {
 
 export const UserDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState(null);
   const [recentAppointments, setRecentAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -69,12 +70,40 @@ export const UserDashboard = () => {
         </Link>
       </div>
 
-      {/* KPI Stats Grid */}
+      {/* KPI Stats Grid (Clickable) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Appointments" value={stats?.totalAppointments || 0} icon={CalendarCheck} color="brand" />
-        <StatCard title="Pending Confirmation" value={stats?.pending || 0} icon={Clock} color="amber" />
-        <StatCard title="Confirmed Bookings" value={stats?.confirmed || 0} icon={CheckCircle2} color="emerald" />
-        <StatCard title="Completed Visits" value={stats?.completed || 0} icon={CheckCircle2} color="blue" />
+        <StatCard
+          title="Total Appointments"
+          value={stats?.totalAppointments || 0}
+          icon={CalendarCheck}
+          color="brand"
+          subtitle="Click to view all"
+          onClick={() => navigate('/my-appointments')}
+        />
+        <StatCard
+          title="Pending Confirmation"
+          value={stats?.pending || 0}
+          icon={Clock}
+          color="amber"
+          subtitle="Click to filter pending"
+          onClick={() => navigate('/my-appointments?status=PENDING')}
+        />
+        <StatCard
+          title="Confirmed Bookings"
+          value={stats?.confirmed || 0}
+          icon={CheckCircle2}
+          color="emerald"
+          subtitle="Click to filter confirmed"
+          onClick={() => navigate('/my-appointments?status=CONFIRMED')}
+        />
+        <StatCard
+          title="Completed Visits"
+          value={stats?.completed || 0}
+          icon={CheckCircle2}
+          color="blue"
+          subtitle="Click to filter completed"
+          onClick={() => navigate('/my-appointments?status=COMPLETED')}
+        />
       </div>
 
       {/* Next Upcoming Appointment Spotlight */}

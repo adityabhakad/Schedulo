@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   getDashboardStats,
   getAppointmentsSummary,
@@ -99,12 +99,40 @@ export const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* KPI Cards Grid */}
+      {/* KPI Cards Grid (Clickable Navigation) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Registered Users" value={stats?.totalUsers || 0} icon={Users} color="brand" />
-        <StatCard title="Active Staff Members" value={stats?.totalStaff || 0} icon={Briefcase} color="cyan" />
-        <StatCard title="Active Services" value={stats?.totalServices || 0} icon={Layers} color="amber" />
-        <StatCard title="Estimated Revenue" value={formatCurrency(stats?.totalRevenue)} icon={DollarSign} color="emerald" />
+        <StatCard
+          title="Total Registered Users"
+          value={stats?.totalUsers || 0}
+          icon={Users}
+          color="brand"
+          subtitle="Click to manage users"
+          onClick={() => navigate('/admin/users')}
+        />
+        <StatCard
+          title="Active Staff Members"
+          value={stats?.totalStaff || 0}
+          icon={Briefcase}
+          color="cyan"
+          subtitle="Click to manage staff"
+          onClick={() => navigate('/admin/staff')}
+        />
+        <StatCard
+          title="Active Services"
+          value={stats?.totalServices || 0}
+          icon={Layers}
+          color="amber"
+          subtitle="Click to manage services"
+          onClick={() => navigate('/admin/services')}
+        />
+        <StatCard
+          title="Estimated Revenue"
+          value={formatCurrency(stats?.totalRevenue)}
+          icon={DollarSign}
+          color="emerald"
+          subtitle="Click to view all appointments"
+          onClick={() => navigate('/admin/appointments')}
+        />
       </div>
 
       {/* Analytics Charts Row 1 */}
